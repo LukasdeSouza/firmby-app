@@ -1,12 +1,28 @@
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { getAllProducts } from './src/supabase/requests';
+import { NavigationContainer } from '@react-navigation/native';
+import Routes from './src/routes';
 
 export default function App() {
+  const [products, setProducts] = useState([])
+
+  const getProducts = async () => {
+    const result = await getAllProducts()
+    setProducts(result)
+  }
+
+
+  useLayoutEffect(() => {
+    getProducts()
+  }, [])
+
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Routes/>
+    </NavigationContainer>
   );
 }
 
