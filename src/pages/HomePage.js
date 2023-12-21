@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Image, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native'
 import Card from '../components/Card'
-import { getAllProducts } from '../supabase/requests';
+import { getAllProducts, getProductByName } from '../supabase/requests';
 import { Ionicons } from '@expo/vector-icons';
+import { listProducts } from '../mocks/listProducts';
 
 
 
@@ -10,7 +11,7 @@ const listMenuItems = [
   {
     id: "call",
     icon: "call-outline",
-    title: "Telefone"
+    title: "Telefone",
   },
   {
     id: "location",
@@ -27,17 +28,23 @@ const listMenuItems = [
 
 
 const HomePage = ({ navigation }) => {
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState(listProducts)
+  const [filter, setFilter] = useState("")
 
   const handleNavigate = (title) => {
     navigation.navigate(title)
   }
 
-  const arr = Array.from({ length: 1 })
 
   const getProducts = async () => {
-    let result = await getAllProducts()
-    setProducts(result)
+    // let result = await getAllProducts()
+    // setProducts(result)
+  }
+
+  const handleChangeFilter = async (value) => {
+    setFilter(value)
+    let filtered = products.filter((item) => filter === item.commerce_name)
+    console.log(filtered)
   }
 
   useEffect(() => {
@@ -48,44 +55,44 @@ const HomePage = ({ navigation }) => {
   return (
     <ScrollView style={styles.home}>
       <StatusBar animated={true} />
-      <View style={styles.actionButtons}>
-        {listMenuItems.map((item) => (
-          <Pressable
-            key={item.id}
-            style={styles.button}
-            onPress={() => handleNavigate(item.title)}
-          >
-            <Ionicons name={item.icon} size={18} />
-            <Text>
-              {item.title}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
       <Pressable style={styles.cardContainer}>
         <ScrollView horizontal='true'>
-          {arr?.map((i, index) => (
-            <Card key={index} available='Sim' navigation={navigation} />
-          ))}
+          <Card available='Sim' navigation={navigation} />
         </ScrollView>
       </Pressable>
-      <Text style={styles.title}>Lista de Produtos</Text>
+      <View style={styles.filterBox}>
+        <Text style={styles.title}>Lista de Produtos</Text>
+        <TextInput
+          style={styles.input}
+          placeholder='Buscar por...'
+          value={filter}
+          onChange={(e) => handleChangeFilter(e.target.value)}
+        />
+      </View>
       {products?.map((item) => (
         <View key={item.id} style={styles.item}>
           <Image
             source={{
-              uri: item?.commerce_image
+              uri: item?.product_image
             }}
-            height={50}
+            height={70}
             width={50}
             borderRadius={8}
           />
           <View style={styles.row}>
             <Text style={styles.title}>
-              {item?.commerce_name}
+              {item?.product_name}
             </Text>
-            <Text style={styles.subtitle}>
-              Disponível: {'Sim'}
+            <Pressable style={styles.chip}>
+              <Text style={styles.chipText}>
+                {`Estoque: ${item?.available ? 'Disponível' : 'Não Disponível'}`}
+              </Text>
+            </Pressable>
+            <Text style={[styles.subtitle, styles.subtitlePrevious]}>
+              De: R${item?.lastPrice}
+            </Text>
+            <Text style={[styles.subtitle, styles.subtitleLast]}>
+              Por: R${item?.price}
             </Text>
           </View>
         </View>
@@ -93,6 +100,8 @@ const HomePage = ({ navigation }) => {
     </ScrollView>
   )
 }
+
+
 
 const styles = StyleSheet.create({
   home: {
@@ -107,6 +116,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: "center",
     gap: 32
+  },
+  input: {
+    borderWidth: 0.3,
+    borderRadius: 8,
+    padding: 8,
+    borderColor: '#CCC',
+    backgroundColor: '#rgba(255,255,255,0.5)'
   },
   button: {
     display: 'flex',
@@ -126,24 +142,53 @@ const styles = StyleSheet.create({
   },
   row: {
     padding: 8,
+    gap: 4
   },
   item: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
-    padding: 8,
+    paddingLeft: 8,
+    paddingRight: 8,
     marginTop: 8,
     borderWidth: 0.5,
     borderColor: '#CCC',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 8,
     overflow: 'hidden',
+  },
+  filterBox: {
+    gap: 8,
+    padding: 8,
+    borderBottomWidth: 0.3,
+    borderColor: '#BBB'
   },
   title: {
     fontWeight: '600'
   },
+  chip: {
+    padding: 2,
+    width: 145,
+    backgroundColor: '#e7edef',
+    borderRadius: 4
+  },
+  chipText : {
+    fontSize: 10,
+    marginLeft: 8,
+    color: '#222'
+  },
   subtitle: {
-    fontWeight: '400'
+    fontWeight: '400',
+    fontSize: 12
+  },
+  subtitlePrevious: {
+    color: '#a5adb0',
+    textDecorationLine: 'line-through'
+  },
+  subtitleLast: {
+    color:'#06b220',
+    fontWeight: '600'
   }
 })
 

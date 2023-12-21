@@ -1,10 +1,19 @@
+import { Ionicons } from '@expo/vector-icons'
 import React, { useState } from 'react'
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { TouchableOpacity } from 'react-native-web'
 
 const LoginPage = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(true)
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
+
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
 
   const handleNavigateBack = () => {
     setModalVisible(false);

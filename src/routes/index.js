@@ -16,11 +16,11 @@ const Routes = () => {
         name="Home"
         component={HomePage}
         options={{
-          title: 'Lista de Produtos',
+          title: 'Cadeiras Store',
           headerBackButtonMenuEnabled: true,
-          // headerRight: (() => (
-          //   <IconButtonHeaderRight  />
-          // ))
+          headerLeft: (() => (
+            <IconButtonHeaderRight  />
+          ))
         }}
       />
       <Stack.Screen
