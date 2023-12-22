@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Image, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Image, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Card from '../components/Card'
+import Modal from 'react-native-modal';
 import { getAllProducts, getProductByName } from '../supabase/requests';
 import { Ionicons } from '@expo/vector-icons';
 import { listProducts } from '../mocks/listProducts';
+import { globalStyles } from '../global/styles';
 
 
 
@@ -29,7 +31,18 @@ const listMenuItems = [
 
 const HomePage = ({ navigation }) => {
   const [products, setProducts] = useState(listProducts)
+  const [productIndex, setProductIndex] = useState(null)
   const [filter, setFilter] = useState("")
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = (index) => {
+    setProductIndex(index)
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
 
   const handleNavigate = (title) => {
     navigation.navigate(title)
@@ -44,7 +57,6 @@ const HomePage = ({ navigation }) => {
   const handleChangeFilter = async (value) => {
     setFilter(value)
     let filtered = products.filter((item) => filter === item.commerce_name)
-    console.log(filtered)
   }
 
   useEffect(() => {
@@ -54,10 +66,10 @@ const HomePage = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.home}>
-      <StatusBar animated={true} />
+      {/* <StatusBar animated={true} /> */}
       <Pressable style={styles.cardContainer}>
-        <ScrollView horizontal='true'>
-          <Card available='Sim' navigation={navigation} />
+        <ScrollView>
+          <Card />
         </ScrollView>
       </Pressable>
       <View style={styles.filterBox}>
@@ -69,8 +81,12 @@ const HomePage = ({ navigation }) => {
           onChange={(e) => handleChangeFilter(e.target.value)}
         />
       </View>
-      {products?.map((item) => (
-        <View key={item.id} style={styles.item}>
+      {products?.map((item, index) => (
+        <TouchableOpacity
+          key={item.id}
+          style={styles.item}
+          onPress={() => openModal(index)}
+        >
           <Image
             source={{
               uri: item?.product_image
@@ -95,8 +111,72 @@ const HomePage = ({ navigation }) => {
               Por: R${item?.price}
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
       ))}
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={closeModal}
+        animationIn="slideInLeft"
+        animationOut="slideOutLeft"
+        backdropTransitionInTiming={300}
+        backdropTransitionOutTiming={300}
+        backdropOpacity={0.3}
+      >
+        <View style={styles.modal}>
+          <Pressable style={styles.modalHeader}>
+            <Text style={styles.storeName}>
+              Loja - Cadeiras Store
+            </Text>
+            <TouchableOpacity onPress={closeModal}>
+              <Ionicons name='close-sharp' size={18} />
+            </TouchableOpacity>
+          </Pressable>
+
+          <Text style={styles.title}>
+            {products[productIndex]?.product_name}
+          </Text>
+          <Image
+            source={{ uri: products[productIndex]?.product_image }}
+            height={300}
+          />
+          <View>
+            <Text style={styles.modalPrice}>
+              R$ {products[productIndex]?.price}
+            </Text>
+            <Text style={styles.subtitleLast}>
+              em até 5x de R$ {products[productIndex]?.price / 5}
+            </Text>
+            <Text>
+              Somente Retirada no Local
+            </Text>
+          </View>
+          <View style={styles.modalFooter}>
+            <Pressable style={[globalStyles.button, globalStyles.defaultPressable]}>
+              <Ionicons
+                name='cart-outline'
+                size={16}
+                color={'#FFF'}
+              />
+              <Text style={globalStyles.defaultPressableText}>
+                Comprar
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[globalStyles.button, globalStyles.outlinedPressable]}
+              onPress={closeModal}
+            >
+              <Ionicons
+                name='arrow-back'
+                size={16}
+                color={'#222'}
+              />
+              <Text style={globalStyles.outlinedPressableText}>
+                Voltar
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   )
 }
@@ -104,18 +184,15 @@ const HomePage = ({ navigation }) => {
 
 
 const styles = StyleSheet.create({
+  flexCenter: {
+    display: 'flex',
+    justifyContet: 'center',
+  },
   home: {
     display: 'flex',
     justifyContet: 'center',
     marginTop: 16,
     padding: 8
-  },
-  actionButtons: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: 'center',
-    justifyContent: "center",
-    gap: 32
   },
   input: {
     borderWidth: 0.3,
@@ -124,21 +201,9 @@ const styles = StyleSheet.create({
     borderColor: '#CCC',
     backgroundColor: '#rgba(255,255,255,0.5)'
   },
-  button: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    minWidth: 90,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 0.3,
-    borderColor: '#BBB'
-  },
   cardContainer: {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: 16
   },
   row: {
     padding: 8,
@@ -164,16 +229,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.3,
     borderColor: '#BBB'
   },
+  storeName: {
+    fontSize: 12,
+    // color: '#464346,'
+  },
   title: {
+    fontSize: 16,
     fontWeight: '600'
   },
   chip: {
     padding: 2,
-    width: 145,
     backgroundColor: '#e7edef',
     borderRadius: 4
   },
-  chipText : {
+  chipText: {
     fontSize: 10,
     marginLeft: 8,
     color: '#222'
@@ -187,9 +256,29 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through'
   },
   subtitleLast: {
-    color:'#06b220',
+    color: '#06b220',
     fontWeight: '600'
+  },
+  modal: {
+    flex: 0.8,
+    padding: 16,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    gap: 4
+  },
+  modalHeader: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  modalPrice: {
+    fontSize: 20,
+  },
+  modalFooter: {
+    marginTop: 8,
+    gap: 8,
   }
+
 })
 
 

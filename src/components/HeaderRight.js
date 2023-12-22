@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { BackHandler, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
+import { closeApp } from '../global/functions';
 
 const listMenuItems = [
   {
@@ -15,11 +16,11 @@ const listMenuItems = [
     icon: "location-outline",
     title: "Localização"
   },
-  {
-    id: "add-product",
-    icon: "add-circle-outline",
-    title: "Cadastrar Produto"
-  },
+  // {
+  //   id: "add-product",
+  //   icon: "add-circle-outline",
+  //   title: "Cadastrar Produto"
+  // },
   {
     id: "person",
     icon: "person-circle-outline",
@@ -44,11 +45,20 @@ const IconButtonHeaderRight = () => {
     setModalVisible(false);
   };
 
+  const handleClickMenuItem = (title) => {
+    if (title === "Sair") {
+      setModalVisible(false)
+      closeApp()
+    } else {
+      navigation.navigate(title)
+    }
+  }
+
 
   return (
     <View >
       <Pressable style={styles.iconButton} onPress={openModal}>
-        <Ionicons name='menu' size={32} color={'#777'}/>
+        <Ionicons name='menu' size={32} color={'#777'} />
       </Pressable>
       <Modal
         isVisible={modalVisible}
@@ -57,16 +67,23 @@ const IconButtonHeaderRight = () => {
         animationOut="slideOutLeft"
         backdropTransitionInTiming={300}
         backdropTransitionOutTiming={300}
-        backdropOpacity={0.3}
+        backdropOpacity={0.2}
       >
         <View style={styles.boxModal}>
           {listMenuItems.map((item) => (
             <TouchableOpacity
+              key={item.id}
               style={styles.menuItem}
-              onPress={() => navigation.navigate(item.title)}
+              onPress={() => handleClickMenuItem(item.title)}
             >
-              <Ionicons name={item.icon} size={20} />
-              <Text>{item.title}</Text>
+              <Ionicons
+                name={item.icon}
+                size={20}
+                color={item.title === "Sair" && 'red'}
+              />
+              <Text style={item.title === "Sair" && styles.logout}>
+                {item.title}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -79,10 +96,7 @@ const IconButtonHeaderRight = () => {
 const styles = StyleSheet.create({
   boxModal: {
     position: 'absolute',
-    // left: 0,
     top: 30,
-    width: 150,
-    height: 220,
     borderRadius: 8,
     padding: 12,
     backgroundColor: '#FFF',
@@ -93,10 +107,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: "center",
-    gap: 6,
+    gap: 8,
   },
   title: {
     fontWeight: '600',
+  },
+  logout: {
+    color: 'red'
   },
   iconButton: {
     marginRight: 8

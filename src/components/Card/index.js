@@ -1,48 +1,44 @@
 import React, { useState } from 'react'
 import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { listProducts } from '../../mocks/listProducts'
+import { listCarouselProducts } from '../../mocks/listCarouselProducts'
 import { Ionicons } from '@expo/vector-icons'
 
 
 
 const Card = () => {
-  const [randomNumber, setRandomNumber] = useState(Math.floor(Math.random() * 10) + 1)
-  const product = listProducts[randomNumber]
+  const [productIndex, setProductIndex] = useState(0)
+  const product = listCarouselProducts[productIndex]
 
   const swapToLeft = () => {
-    if (randomNumber > 1) {
-      randomMore = randomNumber - 1
-      setRandomNumber(randomMore)
+    if (productIndex > 1) {
+      setProductIndex(productIndex - 1)
     } else {
-      return
+      setProductIndex(2)
     }
   }
   const swapToRight = () => {
-    if (randomNumber < listProducts.length) {
-      randomMinus = randomNumber + 1
-      setRandomNumber(randomMinus)
+    if (productIndex < listCarouselProducts.length - 1) {
+      setProductIndex(productIndex + 1)
     } else {
-      return
+      setProductIndex(0)
     }
   }
-
-
 
   return (
     <View style={styles.card}>
       <Pressable style={[styles.arrow, styles.arrowLeft]}>
         <Ionicons
-          name='arrow-back-circle'
+          name='arrow-back-circle-outline'
           size={32}
-          color={'lightgrey'}
+          color={'#EEE'}
           onPress={swapToLeft}
         />
       </Pressable>
       <Pressable style={[styles.arrow, styles.arrowRight]}>
         <Ionicons
-          name='arrow-forward-circle'
+          name='arrow-forward-circle-outline'
           size={32}
-          color={'lightgrey'}
+          color={'#EEE'}
           onPress={swapToRight}
         />
       </Pressable>
@@ -58,9 +54,8 @@ const Card = () => {
         source={{
           uri: product.product_image
         }}
+        height={250}
         alt={product.product_name}
-        height={230}
-        borderRadius={32}
       />
     </View>
   )
@@ -70,20 +65,13 @@ const styles = StyleSheet.create({
   card: {
     display: 'flex',
     flexDirection: 'column',
-    width: '100%',
-    paddingLeft: 16,
-    paddingRight: 16,
     marginBottom: 16,
-    gap: 8,
+    gap: 8
   },
   arrow: {
     position: 'absolute',
     bottom: '40%',
     zIndex: 1
-
-  },
-  arrowLeft: {
-    left: 1
   },
   arrowRight: {
     right: 1,
@@ -97,18 +85,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontWeight: '600',
     fontSize: 18
-  },
-  cta: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    width: 180,
-    backgroundColor: 'rgba(255,255,255, 0.8)',
-    borderRadius: 8
-  },
-  ctaText: {
-    fontWeight: '600'
   }
 })
 
