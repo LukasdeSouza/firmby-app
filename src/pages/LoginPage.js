@@ -1,10 +1,38 @@
 import React, { useState } from 'react'
-import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { adminUser } from '../mocks/user'
+import { Link } from '@react-navigation/native'
+import { globalStyles } from '../global/styles'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+
 
 const LoginPage = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
+
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+
+  const handleLogin = () => {
+    setLoading(true)
+    if (user === adminUser.userName && password === adminUser.password) {
+      AsyncStorage.setItem('@userLogged-firmby', 'logado')
+      Alert.alert('Login Efetuado com Sucesso')
+      navigation.navigate('Home')
+    } else {
+      Alert.alert('Usuário ou Senha Incorretos')
+    }
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }
 
   const handleNavigateBack = () => {
     setModalVisible(false);
@@ -22,9 +50,13 @@ const LoginPage = ({ navigation }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            <Image
+              source={require('../image/logo/firmby.png')}
+              style={{ width: 40, height: 40, borderRadius: 50 }}
+            />
             <Text style={styles.modalText}>Faça Login</Text>
             <Text style={styles.modalSubtitle}>
-              Login de usuário administrador
+              Entre com seu email cadastrado e senha
             </Text>
             <TextInput
               style={styles.input}
@@ -32,27 +64,39 @@ const LoginPage = ({ navigation }) => {
               autoFocus={true}
               inputMode='email'
               placeholder='renatocariani@gmail.com'
-              onChange={(e) => setUser(e.target.value)}
+              onChangeText={(text) => setUser(text)}
             />
             <TextInput
               style={styles.input}
               value={password}
               inputMode='numeric'
               placeholder='*******'
-              onChange={(e) => setPassword(e.target.value)}
+              onChangeText={(text) => setPassword(text)}
             />
-            <Pressable
+
+            <TouchableOpacity
               style={[styles.button, styles.buttonOpen]}
-            // onPress={() => setModalVisible(!modalVisible)}
+              onPress={handleLogin}
             >
-              <Text style={styles.textStyle}>Entrar</Text>
-            </Pressable>
+              {loading ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <Text style={styles.textStyle}>Login</Text>
+              )}
+            </TouchableOpacity >
+
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={handleNavigateBack}
             >
               <Text style={styles.textStyleBack}>Voltar</Text>
             </Pressable>
+            <Link style={globalStyles.link} to={'/Cadastro'}>
+              Não possui cadastro? Clique Aqui
+            </Link>
+            <Link style={globalStyles.copyright} to={'/Cadastro'}>
+              Developed by Firmby
+            </Link>
           </View>
         </View>
       </Modal>
@@ -68,13 +112,11 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-    // margin: 20,
     gap: 8,
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 32,
-    height: 340,
-    width: 270,
+    width: 300,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -102,7 +144,7 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   textStyle: {
-    color: 'white',
+    color: '#FFF',
     fontWeight: 'bold',
     textAlign: 'center',
   },

@@ -3,6 +3,7 @@ import React from 'react'
 import HomePage from '../pages/HomePage'
 import IconButtonHeaderRight from '../components/HeaderRight'
 import LoginPage from '../pages/LoginPage'
+import RegisterPage from '../pages/RegisterPage'
 import LocalizationPage from '../pages/LocalizationPage'
 import PhoneNumber from '../pages/PhoneNumber'
 
@@ -16,18 +17,27 @@ const Routes = () => {
         name="Home"
         component={HomePage}
         options={{
-          title: 'Lista de Produtos',
+          title: 'Cadeiras Store',
           headerBackButtonMenuEnabled: true,
-          // headerRight: (() => (
-          //   <IconButtonHeaderRight  />
-          // ))
+          headerTintColor: '#3e84ed',
+          headerLeft: (() => (
+            <IconButtonHeaderRight  />
+          )),
         }}
       />
       <Stack.Screen
-        name="Telefone"
+        name="Localização"
+        component={LocalizationPage}
+        options={{
+          title: 'Localização',
+          headerBackButtonMenuEnabled: true,
+        }}
+      />
+      <Stack.Screen
+        name="Fale Conosco"
         component={PhoneNumber}
         options={{
-          title: 'Telefone',
+          title: 'Fale Conosco',
           headerBackButtonMenuEnabled: true,
         }}
       />
@@ -42,10 +52,18 @@ const Routes = () => {
       <Stack.Screen
         name="Login"
         component={LoginPage}
-        options={{
-          title: 'Login',
-          headerBackButtonMenuEnabled: true,
-        }}
+        // options={{
+        //   title: 'Login',
+        //   headerBackButtonMenuEnabled: true,
+        // }}
+      />
+      <Stack.Screen
+        name="Cadastro"
+        component={RegisterPage}
+        // options={{
+        //   title: 'Login',
+        //   headerBackButtonMenuEnabled: true,
+        // }}
       />
     </Stack.Navigator>
   )
