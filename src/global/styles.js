@@ -15,6 +15,9 @@ export const globalStyles = StyleSheet.create({
   defaultPressable: {
     backgroundColor: '#06b220',
   },
+  disabledPressable: {
+    backgroundColor: '#AAAA'
+  },
   defaultPressableText: {
     color: '#FFF',
     fontSize: 12,

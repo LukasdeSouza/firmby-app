@@ -1,31 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Image, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Card from '../components/Card'
 import Modal from 'react-native-modal';
 import { getAllProducts, getProductByName } from '../supabase/requests';
 import { Ionicons } from '@expo/vector-icons';
 import { listProducts } from '../mocks/listProducts';
 import { globalStyles } from '../global/styles';
-
-
-
-const listMenuItems = [
-  {
-    id: "call",
-    icon: "call-outline",
-    title: "Telefone",
-  },
-  {
-    id: "location",
-    icon: "location-outline",
-    title: "Endereço"
-  },
-  {
-    id: "person",
-    icon: "person-circle-outline",
-    title: "Login"
-  }
-]
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -34,6 +15,8 @@ const HomePage = ({ navigation }) => {
   const [productIndex, setProductIndex] = useState(null)
   const [filter, setFilter] = useState("")
   const [modalVisible, setModalVisible] = useState(false);
+  const [logged, setLogged] = useState("")
+
 
   const openModal = (index) => {
     setProductIndex(index)
@@ -48,7 +31,6 @@ const HomePage = ({ navigation }) => {
     navigation.navigate(title)
   }
 
-
   const getProducts = async () => {
     // let result = await getAllProducts()
     // setProducts(result)
@@ -59,8 +41,15 @@ const HomePage = ({ navigation }) => {
     let filtered = products.filter((item) => filter === item.commerce_name)
   }
 
+  const getUserLogged = async () => {
+    let isLogged = await AsyncStorage.getItem('@userLogged-firmby')
+    setLogged(isLogged)
+  }
+
+
   useEffect(() => {
     getProducts()
+    getUserLogged()
   })
 
 
@@ -151,16 +140,30 @@ const HomePage = ({ navigation }) => {
             </Text>
           </View>
           <View style={styles.modalFooter}>
-            <Pressable style={[globalStyles.button, globalStyles.defaultPressable]}>
-              <Ionicons
-                name='cart-outline'
-                size={16}
-                color={'#FFF'}
-              />
-              <Text style={globalStyles.defaultPressableText}>
-                Comprar
-              </Text>
-            </Pressable>
+            {logged === 'logado'
+              ? <Pressable style={[globalStyles.button, globalStyles.defaultPressable]}>
+                <Ionicons
+                  name='cart-outline'
+                  size={16}
+                  color={'#FFF'}
+                />
+                <Text style={globalStyles.defaultPressableText}>
+                  Comprar
+                </Text>
+              </Pressable>
+              : <Pressable style={[globalStyles.button, globalStyles.disabledPressable]} disabled>
+                <Ionicons
+                  name='information-circle'
+                  size={16}
+                  color={'#FFF'}
+                />
+                <Text style={globalStyles.defaultPressableText}>
+                  Faça Login para Comprar
+                </Text>
+              </Pressable>
+            }
+
+
             <Pressable
               style={[globalStyles.button, globalStyles.outlinedPressable]}
               onPress={closeModal}
@@ -240,7 +243,10 @@ const styles = StyleSheet.create({
   chip: {
     padding: 2,
     backgroundColor: '#e7edef',
-    borderRadius: 4
+    borderRadius: 4,
+    // width:'70%'
+    // minWidth: 90,
+    maxWidth: 140
   },
   chipText: {
     fontSize: 10,

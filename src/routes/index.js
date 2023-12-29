@@ -19,9 +19,10 @@ const Routes = () => {
         options={{
           title: 'Cadeiras Store',
           headerBackButtonMenuEnabled: true,
+          headerTintColor: '#3e84ed',
           headerLeft: (() => (
             <IconButtonHeaderRight  />
-          ))
+          )),
         }}
       />
       <Stack.Screen

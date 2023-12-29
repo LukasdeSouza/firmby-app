@@ -1,9 +1,9 @@
-import { Ionicons } from '@expo/vector-icons'
 import React, { useState } from 'react'
-import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { adminUser } from '../mocks/user'
 import { Link } from '@react-navigation/native'
 import { globalStyles } from '../global/styles'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 
@@ -15,15 +15,16 @@ const LoginPage = ({ navigation }) => {
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
+
   const handleLogin = () => {
     setLoading(true)
     if (user === adminUser.userName && password === adminUser.password) {
-      localStorage.setItem('@userLogged-firmby', true)
+      AsyncStorage.setItem('@userLogged-firmby', 'logado')
+      Alert.alert('Login Efetuado com Sucesso')
       navigation.navigate('Home')
     } else {
       Alert.alert('Usuário ou Senha Incorretos')
@@ -49,6 +50,10 @@ const LoginPage = ({ navigation }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            <Image
+              source={require('../image/logo/firmby.png')}
+              style={{ width: 40, height: 40, borderRadius: 50 }}
+            />
             <Text style={styles.modalText}>Faça Login</Text>
             <Text style={styles.modalSubtitle}>
               Entre com seu email cadastrado e senha
@@ -59,14 +64,14 @@ const LoginPage = ({ navigation }) => {
               autoFocus={true}
               inputMode='email'
               placeholder='renatocariani@gmail.com'
-              onChange={(e) => setUser(e.target.value)}
+              onChangeText={(text) => setUser(text)}
             />
             <TextInput
               style={styles.input}
               value={password}
               inputMode='numeric'
               placeholder='*******'
-              onChange={(e) => setPassword(e.target.value)}
+              onChangeText={(text) => setPassword(text)}
             />
 
             <TouchableOpacity
